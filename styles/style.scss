@@ -1,0 +1,350 @@
+// 這裡設定一個變數，裡面用來當網頁的主要顏色
+$themeColor: rgba(120, 98, 244, 0.5);
+
+// 瀏覽器對一些element有預設的padding和margin，這邊把它去掉。
+// 然後box-sizing使用border-box
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+
+  //&等於*，selection是pseudo很常用的，就是我們選取(反白)的部分改成以下
+  &::selection {
+    background-color: $themeColor;
+    color: mintcream;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  // 因為瀏覽器預設h標籤為粗體字，所以這邊把它去掉
+  font-weight: normal;
+}
+
+body {
+  position: relative;
+
+  img.fixed-image {
+    // 讓圖片占滿整個頁面
+    min-height: 100vh;
+    width: 100%;
+
+    // HTML元素預設都是Static的，Static並不是positioned element，所以我們要另外設定position屬性，因為positioned element才能設定z-index
+    // fixed的參考是瀏覽器視窗來做定位的
+    position: fixed;
+    bottom: 0;
+    left: 0;
+
+    // 因為不希望圖片遮住網頁的任何東西所以要把z-index設定最小
+    z-index: -5;
+  }
+
+  header {
+    // 背景色一定要設定一個色，以免我們等一下的背景圖片出現在這個區塊
+    // 因為要用橫向排列所以把header變成flex container這樣裡面的flex item就會是橫向排列的
+    // flex-wrap: wrap;會讓超過寬度的flex item換行而不是縮小
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    // 讓section.logo和nav中心在同一個水平線上
+    align-items: center;
+
+    // 被設定為sticky的element會被視為相對定位，直到超過指定的threshold(臨界點)時會被視為固定定位
+    position: sticky;
+
+    // 這裡設定了距離上方0的意思是，當我們移動滾輪使element與瀏覽器上方的距離小於0時，他就會被固定在距離瀏覽器上方的0的位子
+    // 0就是一直在上方的意思了
+    top: 0;
+
+    // 要讓nav蓋過其他element，所以z-index設定為網頁最大，記得要有設定position不是static的element才能設定z-index
+    z-index: 10;
+
+    // 讓nav底下有陰影，這樣如果與同樣被景色是白色的區塊在一起時也能有分隔
+    // 這個box shadow是在css tricks中找的
+    box-shadow: 0 10px 6px -6px #777;
+
+    section.logo {
+      // 要讓圖片與h1的content並排
+      display: flex;
+      flex-wrap: wrap;
+      // border: 2px solid purple; 為了排版才先設定border
+
+      // 當有多餘空間時section.logo分到2份，最少要有400px的空間
+      flex: 2 1 400px;
+
+      h1 {
+        font-size: 2.5rem;
+      }
+      img {
+        // vw表示的是view width，也就是螢幕可是範圍寬度的百分比。這邊讓img變成正方形，因為此img是SVG所以縮放畫質都不會跑掉
+        width: 6vw;
+        height: 6vw;
+      }
+    }
+
+    nav {
+      // border: 2px solid tomato; 為了排版才先設定border
+
+      // 當有多餘空間時navo分到5份，最少要有500px的空間
+      flex: 5 1 500px;
+
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        //   去掉ul預設的黑點
+        list-style-type: none;
+        //   justify-content定義flex item如何沿著flex container的主軸在item和周圍間分配空間
+        justify-content: space-around;
+
+        li {
+          a {
+            color: black;
+            // 把a標籤預設的底線去掉
+            text-decoration: none;
+            font-size: 1.35rem;
+
+            // 讓a標籤的所有樣式轉變都要經過0.2s，時間函數為ease
+            transition: all 0.2s ease;
+
+            //   讓a標籤的content離下border有0.3rem的距離
+            padding-bottom: 0.3rem;
+
+            // &等於a，游標移到a標籤上時顏色變成$themeColor，並且出現2px實心顏色為$themeColor的下外框
+            &:hover {
+              color: $themeColor;
+              border-bottom: 2px solid $themeColor;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  main {
+    section.background-img {
+      // 設定背景圖片
+      min-height: 70vh;
+      background-image: url("../images/日本櫻花.jpg");
+
+      // 設定為cover圖片會保持同比例縮放到盡可能小的尺寸以填充容器(高寬完全覆蓋)，如果比例與元素不同的話，則圖片會被垂直或水平裁剪
+      background-size: cover;
+
+      // background-position可以設定圖片初始位置，center就是中間 */
+      background-position: center;
+      transition: all 0.75s ease;
+
+      // 要讓section.background-img變成positioned element，這樣下面的filter才能對照
+      position: relative;
+      //形成一個stacking context(堆疊環境)
+      z-index: 0;
+
+      display: flex;
+      //讓h3(flex item)置中
+      justify-content: center;
+      align-items: center;
+
+      div.filter {
+        background-color: rgba(0, 0, 0, 0.5);
+        width: 100%;
+        // min-height跟背景圖片一樣高
+        min-height: 70vh;
+
+        // absolute定位參考的是最近的closest positioned ancestor(為position element的最近父節點)=section.background-img
+        // top和left為0就代表他會跟section.background-img在一樣的位子
+        position: absolute;
+        top: 0;
+        left: 0;
+        //使遮罩不會蓋住h3文字
+        z-index: -1;
+      }
+
+      h3 {
+        color: white;
+        // font-size: 2.5rem;
+        // 原本是用rem，但發現很容易跑版所以改成用vmin(會隨著螢幕的寬高兩者之間取較小的當參考單位，例:橫躺的話取高、直向的話取寬)
+        font-size: 6vmin;
+        // 讓文字置中
+        text-align: center;
+      }
+    }
+
+    section.info-circles {
+      background-color: white;
+      padding: 2rem 1rem;
+
+      h3 {
+        font-size: 2rem;
+        text-align: center;
+      }
+
+      div.circles {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        div.circle {
+          padding: 1rem;
+          //設定即使有多餘的空間也不會讓div.circle放大，然後div.circle最小要有250px
+          //因為前面設定box-sizing為border-box，所以裡面的content實際為(250-16(1rem)-16)=218px
+          flex: 0 1 250px;
+
+          display: flex;
+          // div.circle內的flex item變成直向排列(img & p)
+          flex-direction: column;
+          // 讓他們在次軸(row=橫)的中間對齊
+          align-items: center;
+
+          img {
+            //img的寬度為div.circle的content寬度的80%，所以img的寬度為(218*0.8)=174
+            width: 80%;
+
+            //讓img變成圓形的
+            border-radius: 50%;
+            transition: all 0.1s ease;
+            padding: 0.3rem;
+
+            //&等於img，當游標移到img時要多出3px實心顏色為themeColor的border
+            //游標移過去圖片會縮小是因為box-sizing為border(寬度-border-padding剩餘的值才會給content)所以多了border
+            //那content就要-3*2還有原本的-padding(0.3rem)
+            &:hover {
+              border: 3px solid $themeColor;
+            }
+          }
+        }
+      }
+    }
+
+    section.empty-container {
+      min-height: 70vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+
+      //設定justify-content: center和align-items: center讓flex item(h3)置中
+      justify-content: center;
+      align-items: center;
+
+      h3 {
+        // font-size: 2rem;
+        // 原本是用rem，但發現很容易跑版所以改成用vmin(會隨著螢幕的寬高兩者之間取較小的當參考單位，例:橫躺的話取高、直向的話取寬)
+        font-size: 5vmin;
+        color: white;
+      }
+    }
+
+    section.google-map {
+      //沒有設定背景顏色的話，背景圖片會穿過這個區塊
+      background-color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+
+      h3 {
+        font-size: 2.5rem;
+      }
+      p {
+        // font-size: 1.25rem;
+        font-size: 4vmin;
+        margin: 1rem;
+      }
+
+      iframe {
+        width: 100%;
+        height: 40vh;
+      }
+    }
+  }
+
+  footer {
+    //這裡設定為flex的原因是我希望裡面的東西可以置中
+    display: flex;
+    padding: 2rem;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.3);
+
+    section.logo {
+      img {
+        width: 20vw;
+      }
+      h3 {
+        font-size: 2.5rem;
+      }
+    }
+
+    section.links {
+      margin: 2rem;
+      img {
+        width: 5vh;
+        margin: 0rem 1rem;
+      }
+    }
+  }
+}
+
+// 對導覽列(nav)做RWD，當瀏覽器寬度小於700px時，ul的flex-direction由row變成column，這樣flex item就會變成直向排列了，logo大小和排列方式也做更改
+@media screen and (max-width: 700px) {
+  body {
+    header {
+      // 讓header部分在螢幕寬度小於700px時就不要一直在上方了
+      position: static;
+      section.logo {
+        flex-direction: column;
+        img {
+          width: 50vw;
+          height: 50vw;
+        }
+      }
+
+      nav {
+        ul {
+          flex-direction: column;
+          li {
+            padding: 0.5rem 0.25rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 因為當螢幕寬度小於490px時footer的部分就會出現跑版的問題
+@media screen and (max-width: 490px) {
+  body {
+    footer {
+      section.logo {
+        h3 {
+          // 以iPhone SE為基準不會跑版的字體大小設定的
+          font-size: 1.9rem;
+        }
+      }
+      section.links {
+        // 把links設定成flex，因為wrap沒設定，所以讓他底下的圖片自己調整大小在同一行
+        display: flex;
+      }
+    }
+  }
+}
+
+// scrollbar(滾動條)設定，不是每個瀏覽器都支援更改滾動條
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track(滑軌) */
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Handle(滾動條本體) */
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 98, 244, 0.5);
+}
+
+/* Handle on hover(游標移到滾動條) */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(46, 13, 234, 0.5);
+}
